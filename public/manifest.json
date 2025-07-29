@@ -1,0 +1,23 @@
+{
+  "name": "Household Management App",
+  "short_name": "Household",
+  "description": "Manage recipes, shopping lists, and household tasks",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "lifestyle"],
+  "lang": "hu",
+  "dir": "ltr"
+}
+

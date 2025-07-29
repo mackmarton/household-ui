@@ -11,6 +11,12 @@ export const metadata: Metadata = {
     shortcut: '/favicon.svg',
     apple: '/favicon.svg',
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Household App',
+  },
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
