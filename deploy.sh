@@ -53,12 +53,13 @@ fi
 
 # Stop existing containers
 echo "🛑 Stopping existing containers..."
-docker-compose down
+docker-compose down --remove-orphans
 
 # Clean up any orphaned containers that might be using the ports
-echo "🧹 Cleaning up any conflicting containers..."
+echo "🧹 Performing thorough Docker cleanup..."
 docker container prune -f
 docker network prune -f
+docker volume prune -f
 
 # Remove any containers that might be using our ports
 echo "🔍 Checking for port conflicts..."
@@ -69,9 +70,17 @@ if [ ! -z "$CONFLICTING_CONTAINERS" ]; then
     docker rm $CONFLICTING_CONTAINERS
 fi
 
+# Force remove any existing containers with our names
+echo "🗑️  Removing any existing containers with our names..."
+docker rm -f household-backend household-ui household-nginx 2>/dev/null || true
+
+# Clean up any dangling volumes
+echo "🧽 Cleaning up dangling volumes..."
+docker volume ls -q -f dangling=true | xargs -r docker volume rm
+
 # Start the application
 echo "🚀 Starting the application..."
-docker-compose --env-file .env.production up -d
+docker-compose --env-file .env.production up -d --force-recreate
 
 # Wait for services to be ready
 echo "⏳ Waiting for services to start..."
