@@ -30,6 +30,16 @@ fi
 
 echo "✅ Docker and Docker Compose are available"
 
+# Detect docker-compose path
+DOCKER_COMPOSE_PATH=$(which docker-compose)
+echo "🔍 Found docker-compose at: $DOCKER_COMPOSE_PATH"
+
+# Update the service file with the correct path
+echo "📝 Updating service file with correct docker-compose path..."
+sed -i "s|ExecStart=.*docker-compose|ExecStart=$DOCKER_COMPOSE_PATH|g" household-app.service
+sed -i "s|ExecStop=.*docker-compose|ExecStop=$DOCKER_COMPOSE_PATH|g" household-app.service
+sed -i "s|ExecReload=.*docker-compose|ExecReload=$DOCKER_COMPOSE_PATH|g" household-app.service
+
 # Create application directory
 echo "📁 Creating application directory at $APP_DIR..."
 mkdir -p $APP_DIR
@@ -57,6 +67,9 @@ systemctl enable $SERVICE_NAME
 # Start the service now
 echo "▶️  Starting the service..."
 systemctl start $SERVICE_NAME
+
+# Wait a moment for startup
+sleep 5
 
 # Check service status
 echo "📊 Checking service status..."
