@@ -12,12 +12,26 @@ import {
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
 
+// Debug logging to see what URL is being used
+console.log('🔍 API Debug Info:');
+console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
+console.log('BASE_URL:', BASE_URL);
+console.log('All env vars:', Object.keys(process.env).filter(key => key.startsWith('NEXT_PUBLIC')));
+
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// Log API requests for debugging
+api.interceptors.request.use(request => {
+  console.log('🚀 API Request:', request.method?.toUpperCase(), request.url);
+  console.log('🔗 Full URL:', `${request.baseURL}${request.url}`);
+  return request;
+});
+
 
 // Recipe API
 export const recipeApi = {
