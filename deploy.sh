@@ -55,6 +55,20 @@ fi
 echo "🛑 Stopping existing containers..."
 docker-compose down
 
+# Clean up any orphaned containers that might be using the ports
+echo "🧹 Cleaning up any conflicting containers..."
+docker container prune -f
+docker network prune -f
+
+# Remove any containers that might be using our ports
+echo "🔍 Checking for port conflicts..."
+CONFLICTING_CONTAINERS=$(docker ps -q --filter "publish=3000" --filter "publish=8081" --filter "publish=8090")
+if [ ! -z "$CONFLICTING_CONTAINERS" ]; then
+    echo "⚠️  Found containers using our ports. Stopping them..."
+    docker stop $CONFLICTING_CONTAINERS
+    docker rm $CONFLICTING_CONTAINERS
+fi
+
 # Start the application
 echo "🚀 Starting the application..."
 docker-compose --env-file .env.production up -d
