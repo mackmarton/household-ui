@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   title: "Household App",
   description: "Manage recipes, shopping lists, and household tasks",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
