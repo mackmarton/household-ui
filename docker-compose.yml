@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # Spring Backend
+  backend:
+    image: household-backend:latest  # Update with your actual Spring Boot image name
+    container_name: household-backend
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=production
+      - DATASOURCE_URL=${DATASOURCE_URL:-jdbc:postgresql://host.docker.internal:5432/household}
+      - DATASOURCE_PASSWORD=${DATASOURCE_PASSWORD}
+      - SERVER_PORT=8081
+      - UI_URL=http://frontend:3000
+    networks:
+      - household-network
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: household-ui
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8090
+    depends_on:
+      - backend
+    networks:
+      - household-network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy (optional but recommended)
+  nginx:
+    image: nginx:alpine
+    container_name: household-nginx
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro  # For SSL certificates
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - household-network
+    restart: unless-stopped
+
+networks:
+  household-network:
+    driver: bridge
+
+volumes:
+  postgres_data:  # If you're using PostgreSQL
