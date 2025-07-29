@@ -26,22 +26,30 @@ if [ -f .env.production ]; then
     echo "📋 Loading production environment variables..."
     export $(cat .env.production | xargs)
 else
-    echo "⚠️  No .env.production file found. Using default values."
+    echo "⚠️  No .env.production file found. Creating default one..."
+    cat > .env.production << EOF
+# Production Environment Variables
+# PostgreSQL running on localhost (same machine as Docker)
+DATASOURCE_PASSWORD=your_database_password
+DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/household
+EOF
+    echo "❗ Please update .env.production with your actual database password before deploying!"
 fi
 
 # Build the frontend
 echo "🔨 Building Next.js frontend..."
 docker-compose build frontend
 
-# Pull/Build backend (update this section based on how you build your Spring app)
+# Pull/Build backend - Skip if image doesn't exist
 echo "🔨 Preparing Spring backend..."
-# If you have a Dockerfile for your Spring app:
-docker build -t $BACKEND_IMAGE /path/to/your/spring/app
-
-# If you're using a pre-built JAR:
-# docker build -f backend.Dockerfile -t $BACKEND_IMAGE .
-
-echo "⚠️  Make sure your Spring Boot backend image '$BACKEND_IMAGE' is available"
+if docker images | grep -q "household-backend"; then
+    echo "✅ Spring backend image found"
+else
+    echo "⚠️  Spring backend image not found. Please build it first:"
+    echo "    docker build -t household-backend:latest /path/to/your/spring/app"
+    echo "    Or provide the image via docker pull if it's in a registry"
+    echo "🚀 Continuing with frontend-only deployment..."
+fi
 
 # Stop existing containers
 echo "🛑 Stopping existing containers..."
