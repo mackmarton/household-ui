@@ -17,7 +17,7 @@ export default function RootLayout({
       <html lang="en">
       <body className="antialiased bg-gray-50 min-h-screen font-sans">
       <Navigation />
-      <main className="pt-20">
+      <main className="pb-20">
         {children}
       </main>
       </body>
